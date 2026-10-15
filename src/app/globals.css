@@ -1,26 +1,284 @@
 @import "tailwindcss";
 
+/* Dark-first theming: `dark:` variants follow [data-theme="dark"] */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------
+   Design tokens — semantic, so every surface/input/icon stays legible
+   in both themes. Dark is the default (:root), light overrides it.
+------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #070a12;
+  --surface: #0d1322;
+  --surface-2: #131b2c;
+  --border: #1e2a41;
+  --border-strong: #2c3c59;
+  --fg: #e9eef7;
+  --muted: #97a5bb;
+  --faint: #6b7a93;
+  --accent: #38bdf8;
+  --accent-strong: #0ea5e9;
+  --accent-2: #a78bfa;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --ring: rgba(56, 189, 248, 0.6);
+  --grid: rgba(148, 163, 184, 0.07);
+  --glow: rgba(56, 189, 248, 0.16);
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #eef1f7;
+  --border: #dde3ed;
+  --border-strong: #c3cddd;
+  --fg: #0b1220;
+  --muted: #4c586b;
+  --faint: #6b7688;
+  --accent: #0284c7;
+  --accent-strong: #0369a1;
+  --accent-2: #7c3aed;
+  --accent-soft: rgba(2, 132, 199, 0.1);
+  --ring: rgba(2, 132, 199, 0.5);
+  --grid: rgba(15, 23, 42, 0.05);
+  --glow: rgba(2, 132, 199, 0.12);
+
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-2: var(--accent-2);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    /* subtle engineered backdrop */
+    background-image:
+      radial-gradient(60rem 32rem at 78% -8%, var(--glow), transparent 60%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 100% 100%, 64px 64px, 64px 64px;
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--bg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 74rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Refined glassmorphism — used only on selected elements */
+  .glass {
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  }
+
+  .panel {
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    border: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.7rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.15rem;
+    transition: transform 0.2s ease, background-color 0.2s ease,
+      border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid transparent;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #04121b;
+    box-shadow: 0 8px 24px -12px var(--accent);
+  }
+  .btn-primary:hover {
+    background: var(--accent-strong);
+    color: #ffffff;
+  }
+  .btn-ghost {
+    border-color: var(--border-strong);
+    color: var(--fg);
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+  }
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Motion — lightweight, CSS-driven, reduced-motion aware
+------------------------------------------------------------------- */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -140;
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+.reveal.is-visible {
+  animation: reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.flow-line {
+  stroke-dasharray: 6 10;
+  animation: flow 4s linear infinite;
+}
+
+.node-pulse {
+  animation: pulse-soft 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+  .flow-line,
+  .node-pulse {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }
